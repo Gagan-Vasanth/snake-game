@@ -1,0 +1,17 @@
+.snakeBodyElement {
+  width: 30px;
+  height: 30px;
+  border-radius: 30%;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.foodElement {
+  width: 30px;
+  height: 30px;
+  border-radius: 30%;
+  background-color: rgba(176, 176, 101, 0.75);
+}
+
+body {
+  overflow: hidden;
+}
