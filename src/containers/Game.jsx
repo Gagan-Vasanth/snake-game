@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import styled from "styled-components";
+import CountdownTimer from "./CountdownTimer";
 import Food from "./Food";
 import Snake from "./Snake";
 
@@ -12,18 +13,51 @@ const OuterContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  user-select: none;
 `;
 
 const SnackGameContainer = styled.div`
-  border: 2px solid black;
+  position: relative;
   display: grid;
+  place-items: center;
   grid-template-columns: repeat(21, 1fr);
   grid-template-rows: repeat(21, 1fr);
+  background-color: #ac6;
+  box-shadow: inset 0 0 60px rgba(48, 80, 0, 0.3);
+  outline: 4px solid rgba(0, 0, 0, 0.75);
+`;
+
+const ScoreAndHighScoreContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  width: 100%;
+`;
+
+const DisplayScore = styled.div`
+  font-size: 16px;
+  font-weight: 700;
+`;
+
+const GameOverContainer = styled.div`
+  font-size: 120px;
+  font-weight: 900;
+  line-height: 0.95;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-20%);
+  pointer-events: none;
+  background: transparent;
 `;
 
 const Game = ({ snakeSpeed }) => {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
+  const [timerFunction, setTimeFunction] = useState(true);
   let lastRenderedTime = 0;
   let gameIsOver = false;
 
@@ -31,14 +65,14 @@ const Game = ({ snakeSpeed }) => {
   const foodComponentRef = useRef(null);
 
   useEffect(() => {
-    window.requestAnimationFrame(startGame);
+    setTimeout(() => {
+      setTimeFunction(false);
+      window.requestAnimationFrame(startGame);
+    }, 4300);
   }, []);
 
   const startGame = (currentTime) => {
     if (gameIsOver) {
-      if (confirm("You lost! Press Ok to Start Again..")) {
-        return (window.location = "/");
-      }
       return false;
     }
     window.requestAnimationFrame(startGame);
@@ -101,18 +135,28 @@ const Game = ({ snakeSpeed }) => {
 
   return (
     <OuterContainer>
-      <div>Your Current Score: {score}</div>
-      <SnackGameContainer
-        id="gameContainer"
-        // style={gameOver ? { opacity: "0.25", userSelect: "none" } : {}}
-      >
-        <Snake ref={snakeComponentRef} />
-        <Food
-          ref={foodComponentRef}
-          onSnake={(position) => checkIfFoodIsCaptured(position)}
-          expandSnake={(amount) => expandSnake(amount)}
-        />
-      </SnackGameContainer>
+      {timerFunction ? (
+        <CountdownTimer />
+      ) : (
+        <div>
+          <SnackGameContainer
+            id="gameContainer"
+            className={gameOver ? "hideBoard" : ""}
+          >
+            <Snake ref={snakeComponentRef} />
+            <Food
+              ref={foodComponentRef}
+              onSnake={(position) => checkIfFoodIsCaptured(position)}
+              expandSnake={(amount) => expandSnake(amount)}
+            />
+            {gameOver && <GameOverContainer>Game Over!</GameOverContainer>}
+          </SnackGameContainer>
+          <ScoreAndHighScoreContainer>
+            <DisplayScore>Your Score: {score}</DisplayScore>
+            <DisplayScore>High Score: {score}</DisplayScore>
+          </ScoreAndHighScoreContainer>
+        </div>
+      )}
     </OuterContainer>
   );
 };

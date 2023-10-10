@@ -1,3 +1,11 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 .snakeBodyElement {
   width: 30px;
   height: 30px;
@@ -8,10 +16,40 @@
 .foodElement {
   width: 30px;
   height: 30px;
-  border-radius: 30%;
-  background-color: rgba(176, 176, 101, 0.75);
 }
+
+/* .animateFood {
+  animation: spin 3.5s infinite;
+}
+
+@keyframes appear {
+  0% {
+    transform: scale(0.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(350deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+} */
 
 body {
   overflow: hidden;
+  background-color: #9bba5a;
+  font-family: "Cinzel", serif;
+}
+
+.hideBoard > *:not(:last-child) {
+  /* Your styles for these elements */
+  opacity: 0.3;
 }

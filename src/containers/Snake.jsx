@@ -1,10 +1,12 @@
 import React, { forwardRef, useImperativeHandle, useState } from "react";
 import { useEffect } from "react";
 import { getTheDirectionOfTheInput } from "../helperFunctions";
-import { SNAKE_INITIALE_STATE } from "../specialVariable";
 
 const Snake = forwardRef((props, ref) => {
-  const [snakePosition, setSnakePosition] = useState([{ x: 9, y: 11 }]);
+  const [snakePosition, setSnakePosition] = useState([
+    { x: 9, y: 11 },
+    { x: 10, y: 11 },
+  ]);
   const [newSegment, setNewSegment] = useState(0);
 
   useEffect(() => {
@@ -24,7 +26,7 @@ const Snake = forwardRef((props, ref) => {
   };
 
   const getTheScore = () => {
-    return snakePosition.length - 1;
+    return snakePosition.length - 2;
   };
 
   useImperativeHandle(ref, () => ({
@@ -89,7 +91,7 @@ const Snake = forwardRef((props, ref) => {
     return onSnake(snakePosition[0], { ignoreHead: true });
   };
 
-  return <div id="snake"></div>;
+  return <></>;
 });
 
 export default Snake;
