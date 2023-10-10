@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import styled from "styled-components";
+import { ifSnakeTouchesBoundaries } from "../helperFunctions";
 import CountdownTimer from "./CountdownTimer";
 import Food from "./Food";
 import Snake from "./Snake";
@@ -72,21 +73,18 @@ const Game = ({ snakeSpeed }) => {
   }, []);
 
   const startGame = (currentTime) => {
+    gameIsOver = checkIfGameIsOver();
     if (gameIsOver) {
-      return false;
+      setGameOver(true);
+      return;
     }
     window.requestAnimationFrame(startGame);
     const secondSinceLastRendered = (currentTime - lastRenderedTime) / 1000;
     if (secondSinceLastRendered < 1 / snakeSpeed) return;
     lastRenderedTime = currentTime;
-
     updateGame();
     drawGame();
     setScore(updatedScore());
-    gameIsOver = checkIfGameIsOver();
-    if (gameIsOver) {
-      setGameOver(true);
-    }
   };
 
   const updateGame = () => {
@@ -119,12 +117,6 @@ const Game = ({ snakeSpeed }) => {
     );
   };
 
-  const ifSnakeTouchesBoundaries = (position) => {
-    return (
-      position.x < 1 || position.x > 21 || position.y < 1 || position.y > 21
-    );
-  };
-
   const snakeIsIntersecting = () => {
     return snakeComponentRef.current.isSnakeIntersecting();
   };
@@ -151,9 +143,9 @@ const Game = ({ snakeSpeed }) => {
             />
             {gameOver && <GameOverContainer>Game Over!</GameOverContainer>}
           </SnackGameContainer>
-          <ScoreAndHighScoreContainer>
-            <DisplayScore>Your Score: {score}</DisplayScore>
-            <DisplayScore>High Score: {score}</DisplayScore>
+          <ScoreAndHighScoreContainer id={"scoreContainer"}>
+            <DisplayScore className="score">{score}</DisplayScore>
+            <DisplayScore className="score">H: {score}</DisplayScore>
           </ScoreAndHighScoreContainer>
         </div>
       )}

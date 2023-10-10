@@ -1,6 +1,9 @@
 import React, { forwardRef, useImperativeHandle, useState } from "react";
 import { useEffect } from "react";
-import { getTheDirectionOfTheInput } from "../helperFunctions";
+import {
+  getTheDirectionOfTheInput,
+  ifSnakeTouchesBoundaries,
+} from "../helperFunctions";
 
 const Snake = forwardRef((props, ref) => {
   const [snakePosition, setSnakePosition] = useState([
@@ -26,7 +29,7 @@ const Snake = forwardRef((props, ref) => {
   };
 
   const getTheScore = () => {
-    return snakePosition.length - 2;
+    return (snakePosition.length - 2) * 5;
   };
 
   useImperativeHandle(ref, () => ({
@@ -41,7 +44,6 @@ const Snake = forwardRef((props, ref) => {
 
   const drawSnake = () => {
     const entireSnake = document.getElementById("gameContainer");
-    console.log(snakePosition, "the snake position");
     snakePosition.forEach((eachBoxPosition, index) => {
       const snakeElement = document.createElement("div");
       console.log(eachBoxPosition, index);

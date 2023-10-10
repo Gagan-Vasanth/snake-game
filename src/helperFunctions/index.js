@@ -29,3 +29,7 @@ export const getTheDirectionOfTheInput = () => {
   lastInputDirection = inputDirection;
   return inputDirection;
 };
+
+export const ifSnakeTouchesBoundaries = (position) => {
+  return position.x < 1 || position.x > 21 || position.y < 1 || position.y > 21;
+};
