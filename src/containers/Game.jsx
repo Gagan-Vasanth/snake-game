@@ -55,10 +55,23 @@ const GameOverContainer = styled.div`
   background: transparent;
 `;
 
+const StartContainer = styled.div`
+  cursor: pointer;
+`;
+
+const StartButton = styled.div`
+  padding: 24px;
+  text-align: center;
+  border-radius: 5%;
+  font-weight: 600;
+  box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.5);
+`;
+
 const Game = ({ snakeSpeed }) => {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
-  const [timerFunction, setTimeFunction] = useState(true);
+  const [timerFunction, setTimeFunction] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
   let lastRenderedTime = 0;
   let gameIsOver = false;
 
@@ -66,11 +79,14 @@ const Game = ({ snakeSpeed }) => {
   const foodComponentRef = useRef(null);
 
   useEffect(() => {
-    setTimeout(() => {
-      setTimeFunction(false);
-      window.requestAnimationFrame(startGame);
-    }, 4300);
-  }, []);
+    if (gameStarted) {
+      setTimeFunction(true);
+      setTimeout(() => {
+        setTimeFunction(false);
+        window.requestAnimationFrame(startGame);
+      }, 4300);
+    }
+  }, [gameStarted]);
 
   const startGame = (currentTime) => {
     gameIsOver = checkIfGameIsOver();
@@ -127,7 +143,14 @@ const Game = ({ snakeSpeed }) => {
 
   return (
     <OuterContainer>
-      {timerFunction ? (
+      {!gameStarted && (
+        <StartContainer>
+          <StartButton onClick={() => setGameStarted(true)}>
+            Start Game
+          </StartButton>
+        </StartContainer>
+      )}
+      {gameStarted && timerFunction ? (
         <CountdownTimer />
       ) : (
         <div>
@@ -143,10 +166,12 @@ const Game = ({ snakeSpeed }) => {
             />
             {gameOver && <GameOverContainer>Game Over!</GameOverContainer>}
           </SnackGameContainer>
-          <ScoreAndHighScoreContainer id={"scoreContainer"}>
-            <DisplayScore className="score">{score}</DisplayScore>
-            <DisplayScore className="score">H: {score}</DisplayScore>
-          </ScoreAndHighScoreContainer>
+          {gameStarted && (
+            <ScoreAndHighScoreContainer id={"scoreContainer"}>
+              <DisplayScore className="score">{score}</DisplayScore>
+              <DisplayScore className="score">H: {score}</DisplayScore>
+            </ScoreAndHighScoreContainer>
+          )}
         </div>
       )}
     </OuterContainer>

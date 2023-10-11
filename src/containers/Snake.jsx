@@ -8,7 +8,7 @@ import {
 const Snake = forwardRef((props, ref) => {
   const [snakePosition, setSnakePosition] = useState([
     { x: 9, y: 11 },
-    { x: 10, y: 11 },
+    // { x: 10, y: 11 },
   ]);
   const [newSegment, setNewSegment] = useState(0);
 
