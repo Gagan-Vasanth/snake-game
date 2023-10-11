@@ -6,6 +6,7 @@ import { ifSnakeTouchesBoundaries } from "../helperFunctions";
 import CountdownTimer from "./CountdownTimer";
 import Food from "./Food";
 import Snake from "./Snake";
+import GameOverAudio from "../assets/die.mp3";
 
 const OuterContainer = styled.div`
   width: 100%;
@@ -51,12 +52,21 @@ const GameOverContainer = styled.div`
   position: absolute;
   top: 50%;
   transform: translateY(-20%);
-  pointer-events: none;
   background: transparent;
+  user-select: none;
+  cursor: pointer;
 `;
 
 const StartContainer = styled.div`
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  width: 600px;
+  padding: 100px 49px;
+  border-radius: 3%;
+  outline: 3px solid black;
 `;
 
 const StartButton = styled.div`
@@ -64,14 +74,43 @@ const StartButton = styled.div`
   text-align: center;
   border-radius: 5%;
   font-weight: 600;
-  box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.5);
+  font-size: 32px;
+
+  &:hover {
+    background: #373434;
+    color: #ffffff;
+  }
 `;
 
-const Game = ({ snakeSpeed }) => {
+const SnakeGameHeading = styled.div`
+  font-size: 120px;
+  font-weight: 800;
+`;
+
+const LevelContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 24px;
+`;
+
+const SnakeHeadingContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const Game = () => {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [timerFunction, setTimeFunction] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [snakeSpeed, setSnakeSpeed] = useState(5);
+  const [highScore, setHighScore] = useState();
   let lastRenderedTime = 0;
   let gameIsOver = false;
 
@@ -79,12 +118,36 @@ const Game = ({ snakeSpeed }) => {
   const foodComponentRef = useRef(null);
 
   useEffect(() => {
+    const currentHighScore = window.localStorage.getItem(
+      getNameFromSpeed[snakeSpeed]
+    );
+
+    setHighScore(currentHighScore ? currentHighScore : 0);
+  }, []);
+
+  useEffect(() => {
+    const currentHighScore = window.localStorage.getItem(
+      getNameFromSpeed[snakeSpeed]
+    );
+    console.log(currentHighScore, snakeSpeed, "current high score");
+    if (currentHighScore && score > currentHighScore) {
+      window.localStorage.setItem(getNameFromSpeed[snakeSpeed], score);
+    } else {
+      window.localStorage.setItem(
+        getNameFromSpeed[snakeSpeed],
+        currentHighScore ? currentHighScore : 0
+      );
+    }
+    setHighScore(window.localStorage.getItem(getNameFromSpeed[snakeSpeed]));
+  }, [gameOver, snakeSpeed]);
+
+  useEffect(() => {
     if (gameStarted) {
       setTimeFunction(true);
       setTimeout(() => {
         setTimeFunction(false);
         window.requestAnimationFrame(startGame);
-      }, 4300);
+      }, 3200);
     }
   }, [gameStarted]);
 
@@ -92,6 +155,7 @@ const Game = ({ snakeSpeed }) => {
     gameIsOver = checkIfGameIsOver();
     if (gameIsOver) {
       setGameOver(true);
+      gameOverAudioPlay();
       return;
     }
     window.requestAnimationFrame(startGame);
@@ -141,13 +205,56 @@ const Game = ({ snakeSpeed }) => {
     return snakeComponentRef.current.getTheScore();
   };
 
+  const getNameFromSpeed = {
+    5: "SLUG",
+    7: "WARM",
+    9: "PYTHON",
+  };
+
+  const gameOverAudioPlay = async () => {
+    const audioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
+    const audioElement = new Audio(GameOverAudio); // Path to your sound file
+    const source = audioContext.createMediaElementSource(audioElement);
+    source.connect(audioContext.destination);
+    await audioElement.play();
+  };
+
   return (
     <OuterContainer>
       {!gameStarted && (
-        <StartContainer>
-          <StartButton onClick={() => setGameStarted(true)}>
-            Start Game
-          </StartButton>
+        <StartContainer id="startContainer">
+          <SnakeHeadingContainer>
+            <div className="foodElement animateFood"></div>
+            <SnakeGameHeading>Snake</SnakeGameHeading>
+            <div className="foodElement animateFood"></div>
+          </SnakeHeadingContainer>
+          <LevelContainer>
+            <StartButton
+              onClick={() => {
+                setSnakeSpeed(5);
+                setGameStarted(true);
+              }}
+            >
+              SLUG
+            </StartButton>
+            <StartButton
+              onClick={() => {
+                setSnakeSpeed(7);
+                setGameStarted(true);
+              }}
+            >
+              WARM
+            </StartButton>
+            <StartButton
+              onClick={() => {
+                setSnakeSpeed(9);
+                setGameStarted(true);
+              }}
+            >
+              PYTHON
+            </StartButton>
+          </LevelContainer>
         </StartContainer>
       )}
       {gameStarted && timerFunction ? (
@@ -156,20 +263,27 @@ const Game = ({ snakeSpeed }) => {
         <div>
           <SnackGameContainer
             id="gameContainer"
+            style={{ display: gameStarted ? "" : "none" }}
             className={gameOver ? "hideBoard" : ""}
           >
-            <Snake ref={snakeComponentRef} />
+            <Snake ref={snakeComponentRef} snakeSpeed={snakeSpeed} />
             <Food
               ref={foodComponentRef}
               onSnake={(position) => checkIfFoodIsCaptured(position)}
               expandSnake={(amount) => expandSnake(amount)}
             />
-            {gameOver && <GameOverContainer>Game Over!</GameOverContainer>}
+            {gameOver && (
+              <GameOverContainer onClick={() => window.location.assign("/")}>
+                Game Over!
+              </GameOverContainer>
+            )}
           </SnackGameContainer>
           {gameStarted && (
             <ScoreAndHighScoreContainer id={"scoreContainer"}>
               <DisplayScore className="score">{score}</DisplayScore>
-              <DisplayScore className="score">H: {score}</DisplayScore>
+              <DisplayScore className="score">
+                {getNameFromSpeed[snakeSpeed]} {highScore}
+              </DisplayScore>
             </ScoreAndHighScoreContainer>
           )}
         </div>
