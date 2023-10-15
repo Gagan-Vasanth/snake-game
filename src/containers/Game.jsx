@@ -7,6 +7,7 @@ import CountdownTimer from "./CountdownTimer";
 import Food from "./Food";
 import Snake from "./Snake";
 import GameOverAudio from "../assets/die.mp3";
+import Header from "./Header";
 
 const OuterContainer = styled.div`
   width: 100%;
@@ -222,6 +223,7 @@ const Game = () => {
 
   return (
     <OuterContainer>
+      <Header />
       {!gameStarted && (
         <StartContainer id="startContainer">
           <SnakeHeadingContainer>
